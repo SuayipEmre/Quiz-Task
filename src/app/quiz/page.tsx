@@ -1,24 +1,19 @@
 'use client';
 
 import AnswersModal from '@/components/AnswersModal';
+import QuestionCard from '@/components/QuestionCard';
 import { useApiCall } from '@/hooks/useApiCall';
 import { IAnswer } from '@/types/Answers';
-import { count, log } from 'console';
+import { IQuestion } from '@/types/Question';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-type Props = {
-  userId: number;
-  id: number;
-  title: string;
-  body: string;
-  answers?: { option: string; text: string }[];
-};
+
 
 
 
 const Quiz = () => {
-  const [quizData, setQuizData] = useState<Props[]>([]);
+  const [quizData, setQuizData] = useState<IQuestion[]>([]);
   const [answersModal, setAnswersModal] = useState(false)
   const [answers, setAnswers] = useState<IAnswer[]>([])
   const [timer, setTimer] = useState(30)
@@ -29,7 +24,7 @@ const Quiz = () => {
   const fetchData = async () => {
     const data = await apiCall('/posts');
     if (data) {
-      const parsedData = data.slice(0, 10).map((item: Props) => ({
+      const parsedData = data.slice(0, 10).map((item: IQuestion) => ({
         ...item,
         answers: parseBodyToAnswers(item.body),
       }));
@@ -114,20 +109,12 @@ const Quiz = () => {
           {timer}
         </div>
 
-        <div className='flex gap-1'>
-          <p>{step + 1} / {quizData.length} - </p>
-          <h3>{quizData[step]?.title}</h3>
-        </div>
-        <div className='grid grid-cols-12 gap-y-12 xl:gap-12 py-12'  >
-          {quizData[step]?.answers?.map((answer, index) => (
-            <button className='col-span-12 md:col-span-6 xl:col-span-3 bg-white/20 p-4 rounded-md flex gap-2 items-center' key={index} onClick={() => handleChoice(answer.text)}>
-              <p className='bg-slate-400 px-4 py-1 rounded-full text-black  '>
-                {answer.option}:
-              </p>
-              <p>{answer.text}</p>
-            </button>
-          ))}
-        </div>
+        <QuestionCard
+          handleChoice={handleChoice}
+          question={quizData[step]}
+          step={step}
+          totalQuestion={quizData.length}
+        />
       </div>
     )
   }
