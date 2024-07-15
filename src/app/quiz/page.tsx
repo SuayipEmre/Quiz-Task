@@ -3,6 +3,7 @@
 import AnswersModal from '@/components/AnswersModal';
 import QuestionCard from '@/components/QuestionCard';
 import { useApiCall } from '@/hooks/useApiCall';
+import WarningIcon from '@/icons/WarningIcon';
 import { IAnswer } from '@/types/Answers';
 import { IQuestion } from '@/types/Question';
 import Link from 'next/link';
@@ -104,7 +105,11 @@ const Quiz = () => {
       <Link href='/' className='w-full h-full text-red-400'>Quiz soruları yüklenirken hata oluştu. Lütfen Anasayfaya gidip tekrar deneyin.</Link>
     </div>
     return (
-      <div className='text-white bg-white/40  xl:p-20 xl:rounded-xl '>
+      <div className='text-white bg-[#2b3945]  xl:p-20 xl:rounded-xl '>
+        <div className='flex items-center gap-2 animate-bounce'>
+          <WarningIcon />
+          <p>İlk 10 saniye sorular yanıtlanamaz!</p>
+        </div>
         <div className='bg-black w-10 h-10 flex items-center justify-center rounded-full my-4'>
           {timer}
         </div>
@@ -114,13 +119,14 @@ const Quiz = () => {
           question={quizData[step]}
           step={step}
           totalQuestion={quizData.length}
+          timer={timer}
         />
       </div>
     )
   }
 
   return (
-    <div className='bg-black  min-w-screen min-h-screen flex items-center justify-center'>
+    <div className='bg-[#202c37]  min-w-screen min-h-screen flex items-center justify-center'>
       {
         answersModal ? <AnswersModal answers={answers} /> : renderContent()
       }

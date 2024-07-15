@@ -6,11 +6,12 @@ type Props = {
     step : number,
     question : IQuestion
     handleChoice : (answer : string) => void
-    totalQuestion : number
+    totalQuestion : number,
+    timer : number
 }
 
 
-const QuestionCard : React.FC<Props> = ({step, handleChoice, question, totalQuestion}) => {
+const QuestionCard : React.FC<Props> = ({step, handleChoice, question, totalQuestion, timer}) => {
   return (
     <div>
         <div className='flex gap-1'>
@@ -20,8 +21,10 @@ const QuestionCard : React.FC<Props> = ({step, handleChoice, question, totalQues
 
         <div className='grid grid-cols-12 gap-y-12 xl:gap-12 py-12'  >
           {question?.answers?.map((answer, index) => (
-            <button className='col-span-12 md:col-span-6 xl:col-span-3 bg-white/20 p-4 rounded-md flex gap-2 items-center' key={index} onClick={() => handleChoice(answer.text)}>
-              <p className='bg-slate-400 px-4 py-1 rounded-full text-black  '>
+            <button
+            disabled={timer > 20}
+            className='col-span-12 cursor-pointer md:col-span-6 border border-white xl:col-span-3  p-4 rounded-md flex gap-2 items-center' key={index} onClick={() => handleChoice(answer.text)}>
+              <p className='px-4 py-1 rounded-full   '>
                 {answer.option}:
               </p>
               <p>{answer.text}</p>
@@ -31,5 +34,7 @@ const QuestionCard : React.FC<Props> = ({step, handleChoice, question, totalQues
     </div>
   )
 }
+
+
 
 export default QuestionCard
