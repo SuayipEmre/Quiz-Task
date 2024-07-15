@@ -1,7 +1,9 @@
 'use client';
 
+import AnswersModal from '@/components/AnswersModal';
 import { useApiCall } from '@/hooks/useApiCall';
-import { count } from 'console';
+import { IAnswer } from '@/types/Answers';
+import { count, log } from 'console';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -13,14 +15,17 @@ type Props = {
   answers?: { option: string; text: string }[];
 };
 
+
+
 const Quiz = () => {
   const [quizData, setQuizData] = useState<Props[]>([]);
   const [answersModal, setAnswersModal] = useState(false)
+  const [answers, setAnswers] = useState<IAnswer[]>([])
   const [timer, setTimer] = useState(30)
   const [step, setStep] = useState(0);
   const { apiCall, loading, error } = useApiCall();
-  
-  
+
+
   const fetchData = async () => {
     const data = await apiCall('/posts');
     if (data) {
@@ -39,24 +44,30 @@ const Quiz = () => {
 
 
   useEffect(() => {
-    
+
     const interval = setInterval(() => {
-      if(timer > 0 ){
-        setTimer(prev => prev -1)
+      if (timer > 0) {
+        setTimer(prev => prev - 1)
       }
 
-      if(timer == 0 && step < 10){
+      if (timer == 0 && step < 10) {
+        const answer = {
+          questionNumber: step + 1,
+          questionText: quizData[step].title,
+          selectedAnswer: ''
+        }
+        setAnswers(prev => [...prev, answer])
         setStep(step + 1)
         setTimer(30)
-      } else if( step >= 10){
-          setAnswersModal(true)
+      } else if (step >= 10) {
+        setAnswersModal(true)
       }
     }, 1000)
 
     return () => {
       clearInterval(interval)
     }
-  },[timer])
+  }, [timer])
 
 
 
@@ -72,16 +83,24 @@ const Quiz = () => {
   };
 
   const handleChoice = (choice: string) => {
-    console.log(' soru : ' + quizData[step].body, ' - cevap :  ' + choice);
+    const answer = {
+      questionNumber: step + 1,
+      questionText: quizData[step].title,
+      selectedAnswer: choice
+    }
 
     if (step == 9) {
       setAnswersModal(true)
+      setAnswers(prev => [...prev, answer])
     } else {
       setStep(prev => prev + 1)
       setTimer(30)
+      setAnswers(prev => [...prev, answer])
+
     }
 
   }
+
 
 
   const renderContent = () => {
@@ -101,12 +120,12 @@ const Quiz = () => {
         </div>
         <div className='grid grid-cols-12 gap-y-12 xl:gap-12 py-12'  >
           {quizData[step]?.answers?.map((answer, index) => (
-            <div className='col-span-12 md:col-span-6 xl:col-span-3 bg-white/20 p-4 rounded-md flex gap-2 items-center' key={index} onClick={() => handleChoice(answer.text)}>
-              <div className='bg-slate-400 px-4 py-1 rounded-full text-black  '>
+            <button className='col-span-12 md:col-span-6 xl:col-span-3 bg-white/20 p-4 rounded-md flex gap-2 items-center' key={index} onClick={() => handleChoice(answer.text)}>
+              <p className='bg-slate-400 px-4 py-1 rounded-full text-black  '>
                 {answer.option}:
-              </div>
+              </p>
               <p>{answer.text}</p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -116,7 +135,7 @@ const Quiz = () => {
   return (
     <div className='bg-black  min-w-screen min-h-screen flex items-center justify-center'>
       {
-        answersModal ? <></> : renderContent()
+        answersModal ? <AnswersModal answers={answers} /> : renderContent()
       }
     </div>
   );
