@@ -1,5 +1,4 @@
 'use client';
-
 import AnswersModal from '@/components/AnswersModal';
 import QuestionCard from '@/components/QuestionCard';
 import { useApiCall } from '@/hooks/useApiCall';
@@ -15,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 
 const Quiz = () => {
   const [quizData, setQuizData] = useState<IQuestion[]>([]);
-  const [answersModal, setAnswersModal] = useState(false)
+  const [isAnswersModalOpen, setIsAnswersModalOpen] = useState(false)
   const [answers, setAnswers] = useState<IAnswer[]>([])
   const [timer, setTimer] = useState(30)
   const [step, setStep] = useState(0);
@@ -35,7 +34,6 @@ const Quiz = () => {
 
   useEffect(() => {
     fetchData()
-
   }, [])
 
 
@@ -50,13 +48,13 @@ const Quiz = () => {
         const answer = {
           questionNumber: step + 1,
           questionText: quizData[step].title,
-          selectedAnswer: ''
+          selectedAnswer: 'Cevaplanmadı'
         }
         setAnswers(prev => [...prev, answer])
         setStep(step + 1)
         setTimer(30)
       } else if (step >= 10) {
-        setAnswersModal(true)
+        setIsAnswersModalOpen(true)
       }
     }, 1000)
 
@@ -67,9 +65,9 @@ const Quiz = () => {
 
 
 
+  //create question options
   const parseBodyToAnswers = (body: string) => {
-    const words = body.split(' ');
-    const shuffledWords = words.sort(() => 0.5 - Math.random());
+    const shuffledWords = body.split(' ').sort(() => 0.5 - Math.random())
     return [
       { option: 'A', text: shuffledWords[0] || '' },
       { option: 'B', text: shuffledWords[1] || '' },
@@ -78,7 +76,7 @@ const Quiz = () => {
     ];
   };
 
-  const handleChoice = (choice: string) => {
+  const handleAnswerSelection = (choice: string) => {
     const answer = {
       questionNumber: step + 1,
       questionText: quizData[step].title,
@@ -86,7 +84,7 @@ const Quiz = () => {
     }
 
     if (step == 9) {
-      setAnswersModal(true)
+      setIsAnswersModalOpen(true)
       setAnswers(prev => [...prev, answer])
     } else {
       setStep(prev => prev + 1)
@@ -100,22 +98,28 @@ const Quiz = () => {
 
 
   const renderContent = () => {
-    if (loading) return <div className='w-full h-full text-green-500'>Quiz Soruları Yükleniyor...</div>
-    else if (error) return <div className=''>
-      <Link href='/' className='w-full h-full text-red-400'>Quiz soruları yüklenirken hata oluştu. Lütfen Anasayfaya gidip tekrar deneyin.</Link>
+    if (loading) return <div className='w-full h-full text-green-500'>
+      <p>Quiz Soruları Yükleniyor...</p>
+    </div>
+    else if (error) return <div >
+      <Link href='/' className='w-full h-full text-red-400'>Quiz soruları yüklenirken hata oluştu. Lütfen Ana sayfaya gidip tekrar deneyin.</Link>
     </div>
     return (
-      <div className='text-white bg-[#2b3945]  xl:p-20 xl:rounded-xl '>
-        <div className='flex items-center gap-2 animate-bounce'>
-          <WarningIcon />
-          <p>İlk 10 saniye sorular yanıtlanamaz!</p>
-        </div>
-        <div className='bg-black w-10 h-10 flex items-center justify-center rounded-full my-4'>
-          {timer}
+      <div className='text-white p-5 shadow-white-soft bg-[#2b3945] w-full xl:w-[90%] xl:p-20 xl:rounded-xl '>
+
+        <div className='flex flex-col xl:flex-row items-start xl:items-center justify-between'>
+          <p className='bg-third order-2 xl:order-1 text-white w-10 h-10 xl:w-14 xl:h-14 xl:text-xl flex items-center justify-center rounded-full my-4'>
+            {timer}
+          </p>
+          <div className='flex order-1 xl:order-2 items-center gap-2 animate-bounce'>
+            <WarningIcon />
+            <p>İlk 10 saniye sorular yanıtlanamaz.</p>
+          </div>
+
         </div>
 
         <QuestionCard
-          handleChoice={handleChoice}
+          handleAnswerSelection={handleAnswerSelection}
           question={quizData[step]}
           step={step}
           totalQuestion={quizData.length}
@@ -126,9 +130,9 @@ const Quiz = () => {
   }
 
   return (
-    <div className='bg-[#202c37]  min-w-screen min-h-screen flex items-center justify-center'>
+    <div className='bg-third  min-w-screen min-h-screen flex items-center justify-center'>
       {
-        answersModal ? <AnswersModal answers={answers} /> : renderContent()
+        isAnswersModalOpen ? <AnswersModal answers={answers} /> : renderContent()
       }
     </div>
   );
