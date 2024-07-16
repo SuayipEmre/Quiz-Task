@@ -98,10 +98,10 @@ const Quiz = () => {
 
 
   const renderContent = () => {
-    if (loading) return <div className='w-full h-full text-green-500'>
+    if (loading) return <div className='w-screen h-screen flex items-center justify-center text-green-500'>
       <p>Quiz Soruları Yükleniyor...</p>
     </div>
-    else if (error) return <div >
+    else if (error) return <div>
       <Link href='/' className='w-full h-full text-red-400'>Quiz soruları yüklenirken hata oluştu. Lütfen Ana sayfaya gidip tekrar deneyin.</Link>
     </div>
     return (
